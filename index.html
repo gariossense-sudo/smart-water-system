@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -853,4 +854,273 @@
   }
 
 
-  // ===============================
+  // =====================================
+  // DISPLAY DATA FROM FIREBASE
+  // =====================================
+
+  function displayData(data) {
+
+    if (!data) {
+      noticeTitle.textContent = "Data belum tersedia";
+
+      firebaseStatus.textContent =
+        "Login berhasil, tetapi data pada SmartWater/current belum ditemukan. " +
+        "Pastikan ESP8266 sudah mengirim data ke Firebase.";
+
+      return;
+    }
+
+
+    // DEBIT AIR
+    if (data.flowRate !== undefined) {
+      showValue("flowRate", formatNumber(data.flowRate));
+      setDeviceStatus("flowSensorStatus", "DATA DITERIMA", "on");
+    } else {
+      setDeviceStatus("flowSensorStatus", "MENUNGGU");
+    }
+
+
+    // TOTAL VOLUME
+    if (data.totalLiter !== undefined) {
+      showValue("totalLiter", formatNumber(data.totalLiter));
+    }
+
+
+    // KONDISI AIR
+    const water = normalizeStatus(data.waterStatus);
+
+    showValue("waterStatus", water);
+    showValue("tankLabel", water);
+    showValue("conditionText", water);
+
+
+    if (data.waterStatus !== undefined) {
+      setDeviceStatus("floatStatus", water, "on");
+
+      const full = isWaterFull(data.waterStatus);
+
+      document.getElementById("waterFill").style.height =
+        full ? "85%" : "25%";
+
+      document.getElementById("conditionNote").textContent =
+        full
+          ? "Float switch mendeteksi kondisi air penuh."
+          : "Float switch belum mendeteksi kondisi air penuh.";
+    }
+
+
+    // STATUS POMPA
+    const pump = normalizeStatus(data.pumpStatus);
+
+    showValue("pumpStatus", pump);
+
+    if (data.pumpStatus !== undefined) {
+      const pumpOn = isPumpOn(data.pumpStatus);
+
+      setDeviceStatus(
+        "relayStatus",
+        pumpOn ? "POMPA ON" : pump,
+        pumpOn ? "on" : "off"
+      );
+    }
+
+
+    // STATUS DATA ESP8266
+    setDeviceStatus("espStatus", "DATA DITERIMA", "on");
+
+
+    // WAKTU PEMBARUAN
+    updatedInfo.textContent =
+      "Data diterima\n" +
+      new Date().toLocaleTimeString("id-ID");
+
+
+    // INFORMASI
+    noticeTitle.textContent = "Dashboard berhasil terhubung";
+
+    firebaseStatus.textContent =
+      "Data dari Firebase Realtime Database berhasil diterima. " +
+      "Dashboard akan diperbarui otomatis saat ada perubahan data.";
+  }
+
+
+  // =====================================
+  // LOGIN
+  // =====================================
+
+  loginForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    loginButton.disabled = true;
+    loginButton.textContent = "MEMPROSES...";
+
+    loginMessage.className = "login-message";
+    loginMessage.textContent = "Sedang menghubungkan ke Firebase...";
+
+    try {
+
+      await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      loginMessage.textContent = "Login berhasil.";
+      loginMessage.classList.add("success");
+
+      document.getElementById("password").value = "";
+
+    } catch (error) {
+
+      console.error("Firebase login error:", error);
+
+      loginMessage.className = "login-message error";
+
+      if (error.code === "auth/invalid-credential") {
+        loginMessage.textContent =
+          "Email atau password Firebase tidak sesuai.";
+      } else if (error.code === "auth/invalid-email") {
+        loginMessage.textContent =
+          "Format email tidak valid.";
+      } else if (error.code === "auth/unauthorized-domain") {
+        loginMessage.textContent =
+          "Domain website belum diizinkan di Firebase Authentication.";
+      } else if (error.code === "auth/too-many-requests") {
+        loginMessage.textContent =
+          "Terlalu banyak percobaan login. Coba lagi nanti.";
+      } else {
+        loginMessage.textContent =
+          "Login gagal: " + error.message;
+      }
+
+    } finally {
+
+      loginButton.disabled = false;
+      loginButton.textContent = "LOGIN";
+
+    }
+
+  });
+
+
+  // =====================================
+  // AUTHENTICATION STATE
+  // =====================================
+
+  onAuthStateChanged(auth, function(user) {
+
+    // Hentikan listener sebelumnya
+    if (stopListening) {
+      stopListening();
+      stopListening = null;
+    }
+
+
+    if (user) {
+
+      // LOGIN BERHASIL
+      loginPanel.hidden = true;
+      logoutRow.hidden = false;
+
+      webBadge.classList.add("connected");
+      webBadgeText.textContent = "FIREBASE TERHUBUNG";
+
+      noticeTitle.textContent = "Menghubungkan data perangkat...";
+      firebaseStatus.textContent =
+        "Login berhasil. Sedang membaca SmartWater/current.";
+
+      // Ambil data pada lokasi yang sama dengan program ESP8266
+      const dataRef = ref(database, "SmartWater/current");
+
+      stopListening = onValue(
+        dataRef,
+
+        function(snapshot) {
+
+          const data = snapshot.val();
+
+          if (data === null) {
+
+            noticeTitle.textContent = "Data belum tersedia";
+
+            firebaseStatus.textContent =
+              "Belum ada data pada SmartWater/current. " +
+              "Pastikan ESP8266 sudah terhubung dan mengirim data.";
+
+            setDeviceStatus("espStatus", "BELUM ADA DATA");
+
+            return;
+          }
+
+          displayData(data);
+
+        },
+
+        function(error) {
+
+          console.error("Firebase database error:", error);
+
+          noticeTitle.textContent = "Gagal membaca Firebase";
+
+          firebaseStatus.textContent =
+            "Terjadi kesalahan: " + error.message;
+
+          setDeviceStatus("espStatus", "GAGAL", "off");
+
+        }
+      );
+
+
+    } else {
+
+      // BELUM LOGIN
+      loginPanel.hidden = false;
+      logoutRow.hidden = true;
+
+      webBadge.classList.remove("connected");
+      webBadgeText.textContent = "MENUNGGU FIREBASE";
+
+      noticeTitle.textContent = "Menunggu login Firebase";
+
+      firebaseStatus.textContent =
+        "Login menggunakan akun Firebase untuk melihat data ESP8266.";
+
+      resetDashboard();
+
+    }
+
+  });
+
+
+  // =====================================
+  // LOGOUT
+  // =====================================
+
+  logoutButton.addEventListener("click", async function() {
+
+    try {
+
+      await signOut(auth);
+
+      loginMessage.className = "login-message";
+      loginMessage.textContent = "Berhasil keluar dari akun.";
+
+    } catch (error) {
+
+      console.error("Logout error:", error);
+
+      firebaseStatus.textContent =
+        "Gagal keluar: " + error.message;
+
+    }
+
+  });
+
+</script>
+
+</body>
+</html>
