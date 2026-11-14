@@ -5,693 +5,465 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071b32">
+
   <title>Smart Water System | Dashboard</title>
 
   <style>
     :root {
       --bg: #071b32;
       --panel: #102943;
-      --panel2: #14334f;
-      --line: rgba(190,220,245,.12);
-      --text: #eef7ff;
-      --muted: #9bb3c8;
-      --blue: #39b8f2;
-      --cyan: #62e0dc;
-      --green: #3bd69a;
-      --amber: #ffc66d;
-      --red: #ff7185;
-      --shadow: 0 18px 45px rgba(0,0,0,.2);
+      --panel2: #153653;
+      --blue: #38bdf8;
+      --cyan: #22d3ee;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #facc15;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --border: rgba(148,163,184,.15);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 12% 0%,rgba(36,153,211,.22),transparent 38%),
-        radial-gradient(ellipse at 100% 25%,rgba(35,197,180,.12),transparent 35%),
-        var(--bg);
+      background: var(--bg);
       color: var(--text);
-      font-family: Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      padding: 20px;
     }
 
-    .wrap {
-      width: min(1120px,100%);
+    .container {
+      width: 100%;
+      max-width: 1150px;
       margin: auto;
-      padding: 28px 22px 38px;
     }
 
     header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 26px;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
     }
 
-    .brand { display: flex; align-items: center; gap: 13px; }
-
-    .logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg,#35bdf2,#24d5c2);
-      box-shadow: 0 8px 25px rgba(57,184,242,.25);
+    .brand h1 {
+      font-size: 25px;
+      letter-spacing: 1px;
     }
 
-    .logo svg { width: 27px; height: 27px; }
-
-    h1 {
-      font-size: clamp(19px,3vw,25px);
-      letter-spacing: .02em;
-      margin: 0;
-      font-weight: 800;
+    .brand h1 span {
+      color: var(--blue);
     }
 
-    .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .brand p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 7px;
+    }
 
-    .web-badge {
+    .connection {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 11px 15px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 9px 13px;
-      border: 1px solid rgba(255,198,109,.25);
-      background: rgba(255,198,109,.09);
-      border-radius: 999px;
-      color: var(--amber);
+      gap: 9px;
       font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
     }
 
-    .web-badge.connected {
-      border-color: rgba(59,214,154,.25);
-      background: rgba(59,214,154,.09);
-      color: #8bf0c4;
-    }
-
-    .pulse {
-      width: 8px;
-      height: 8px;
+    .dot {
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
-      background: var(--amber);
+      background: var(--yellow);
     }
 
-    .web-badge.connected .pulse {
+    .dot.online {
       background: var(--green);
-      box-shadow: 0 0 0 5px rgba(59,214,154,.12);
+      box-shadow: 0 0 10px var(--green);
+    }
+
+    .dot.offline {
+      background: var(--red);
     }
 
     .welcome {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 18px;
+      background: linear-gradient(120deg, #123d60, #075985);
+      padding: 25px;
+      border-radius: 18px;
       margin-bottom: 22px;
+      border: 1px solid rgba(56,189,248,.2);
     }
 
     .welcome h2 {
-      font-size: clamp(23px,4vw,32px);
-      margin: 0 0 7px;
-      letter-spacing: -.04em;
+      font-size: 22px;
+      margin-bottom: 8px;
     }
 
-    .welcome p { margin: 0; color: var(--muted); font-size: 14px; }
-
-    .updated {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: right;
-      white-space: pre-line;
+    .welcome p {
+      color: #dbeafe;
+      font-size: 13px;
+      line-height: 1.6;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(12,1fr);
-      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 17px;
     }
 
     .card {
-      background: linear-gradient(145deg,rgba(20,51,79,.96),rgba(13,39,63,.96));
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 21px;
-      box-shadow: var(--shadow);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 22px;
+      border-radius: 17px;
       min-width: 0;
     }
 
-    /* LOGIN */
-
-    .login-card {
-      margin-bottom: 20px;
-      box-shadow: var(--shadow);
-    }
-
-    .login-card h3 { margin: 0 0 7px; font-size: 17px; }
-
-    .login-form {
+    .card-header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .login-form input {
-      flex: 1;
-      min-width: 180px;
-      padding: 13px;
-      border-radius: 11px;
-      border: 1px solid var(--line);
-      background: #071b32;
-      color: white;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .login-form input:focus {
-      border-color: var(--blue);
-    }
-
-    .login-form button,
-    .logout-btn {
-      padding: 12px 20px;
-      border: 0;
-      border-radius: 11px;
-      background: linear-gradient(135deg,#39b8f2,#62e0dc);
-      color: #071b32;
-      font-weight: 800;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .login-form button:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
-
-    .login-message {
-      color: var(--amber);
-      font-size: 12px;
-      margin: 12px 0 0;
-      line-height: 1.5;
-    }
-
-    .login-message.success { color: var(--green); }
-    .login-message.error { color: #ff9aa9; }
-
-    .logout-row {
-      display: flex;
-      justify-content: flex-end;
-      margin: -6px 0 20px;
-    }
-
-    .logout-btn {
-      background: rgba(255,113,133,.13);
-      color: #ff9aa9;
-      border: 1px solid rgba(255,113,133,.25);
-    }
-
-    [hidden] { display: none !important; }
-
-    /* DASHBOARD */
-
-    .metric {
-      grid-column: span 3;
-      min-height: 160px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .metric:after {
-      content: "";
-      position: absolute;
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      right: -38px;
-      bottom: -55px;
-      background: rgba(57,184,242,.07);
-    }
-
-    .metric-top {
-      display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       gap: 10px;
+      margin-bottom: 18px;
     }
 
-    .metric-label {
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 600;
+    .card-header h3 {
+      font-size: 14px;
+      color: #cbd5e1;
+      font-weight: 500;
     }
 
-    .icon {
+    .card-icon {
       width: 38px;
       height: 38px;
-      border-radius: 13px;
+      background: var(--panel2);
       display: grid;
       place-items: center;
-      background: rgba(57,184,242,.12);
-      color: var(--blue);
+      border-radius: 11px;
+      font-size: 19px;
     }
 
     .value {
-      font-size: clamp(30px,4vw,39px);
-      font-weight: 800;
-      letter-spacing: -.05em;
-      margin-top: 17px;
+      font-size: 34px;
+      font-weight: bold;
+      color: var(--blue);
+      margin-bottom: 6px;
       overflow-wrap: anywhere;
     }
 
     .unit {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--muted);
-      font-weight: 500;
-      letter-spacing: 0;
-      margin-left: 4px;
     }
 
-    .hint { font-size: 11px; color: #7894aa; margin-top: 5px; }
+    .status {
+      display: inline-block;
+      padding: 8px 13px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: bold;
+      background: rgba(148,163,184,.12);
+      color: var(--muted);
+    }
 
-    .wide { grid-column: span 7; }
-    .side { grid-column: span 5; }
+    .status.good {
+      color: #86efac;
+      background: rgba(34,197,94,.12);
+    }
 
-    .section-title {
+    .status.warning {
+      color: #fde68a;
+      background: rgba(250,204,21,.12);
+    }
+
+    .status.danger {
+      color: #fca5a5;
+      background: rgba(239,68,68,.12);
+    }
+
+    .tank-area {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 18px;
+      justify-content: center;
+      gap: 25px;
+      min-height: 170px;
     }
-
-    .section-title h3 { font-size: 16px; margin: 0; }
-
-    .tag {
-      font-size: 11px;
-      color: var(--muted);
-      border: 1px solid var(--line);
-      padding: 6px 9px;
-      border-radius: 999px;
-    }
-
-    .water-panel { display: flex; align-items: center; gap: 22px; }
 
     .tank {
-      width: 116px;
-      height: 148px;
-      flex: 0 0 116px;
-      border: 3px solid rgba(110,202,238,.65);
-      border-radius: 17px 17px 22px 22px;
+      width: 90px;
+      height: 145px;
+      border: 3px solid #64748b;
+      border-radius: 12px 12px 18px 18px;
       position: relative;
       overflow: hidden;
-      background: rgba(4,19,35,.5);
-    }
-
-    .tank:before {
-      content: "";
-      position: absolute;
-      top: -7px;
-      left: 12px;
-      right: 12px;
-      height: 8px;
-      border-radius: 8px;
-      background: #6ec9eb;
+      background: #071b32;
     }
 
     .water {
       position: absolute;
-      left: 0;
-      right: 0;
       bottom: 0;
-      height: 35%;
-      background: linear-gradient(180deg,rgba(65,194,241,.75),rgba(29,119,194,.9));
-      transition: height .5s ease;
+      left: 0;
+      width: 100%;
+      height: 0%;
+      background: linear-gradient(180deg, #38bdf8, #0284c7);
+      transition: height .7s ease;
     }
 
-    .water:before {
-      content: "";
-      position: absolute;
-      top: -7px;
-      left: -10%;
-      width: 120%;
-      height: 15px;
-      border-radius: 50%;
-      background: rgba(121,225,249,.8);
+    .tank-info h3 {
+      font-size: 19px;
+      margin-bottom: 9px;
     }
 
-    .tank-label {
-      position: absolute;
-      inset: 0;
+    .tank-info p {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .devices {
       display: grid;
-      place-items: center;
-      font-weight: 800;
-      text-shadow: 0 2px 8px #09223b;
-      font-size: 12px;
-      text-align: center;
-      padding: 5px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
     }
 
-    .condition {
-      font-size: 23px;
-      font-weight: 800;
-      margin-bottom: 7px;
+    .device {
+      background: var(--panel2);
+      padding: 14px;
+      border-radius: 12px;
     }
 
-    .condition-note {
+    .device p {
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .state-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 13px 0;
-      border-bottom: 1px solid var(--line);
-      gap: 12px;
-    }
-
-    .state-row:last-child { border: 0; padding-bottom: 0; }
-
-    .state-name {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #d9e9f6;
-      font-size: 13px;
-    }
-
-    .state {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .04em;
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(255,198,109,.1);
-      color: var(--amber);
-      text-align: center;
-    }
-
-    .state.on {
-      background: rgba(59,214,154,.12);
-      color: #8bf0c4;
-    }
-
-    .state.off {
-      background: rgba(255,113,133,.1);
-      color: #ff9aa9;
-    }
-
-    .notice {
-      grid-column: span 12;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      background: rgba(255,198,109,.07);
-      border-color: rgba(255,198,109,.18);
-      box-shadow: none;
-    }
-
-    .notice-icon { color: var(--amber); font-size: 20px; line-height: 1; }
-
-    .notice strong { display: block; font-size: 13px; margin-bottom: 4px; }
-
-    .notice p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
-      white-space: pre-line;
-    }
-
-    footer {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      color: #6f8ba2;
       font-size: 11px;
-      margin-top: 22px;
-      padding: 0 3px;
+      margin-bottom: 9px;
     }
 
-    @media(max-width:800px) {
-      .metric { grid-column: span 6; }
-      .wide,.side { grid-column: span 12; }
+    .device strong {
+      font-size: 12px;
     }
 
-    @media(max-width:480px) {
-      .wrap { padding: 20px 14px 28px; }
-      header { margin-bottom: 25px; }
-      .web-badge { font-size: 10px; padding: 8px 10px; }
-      .metric { padding: 17px; min-height: 145px; }
-      .card { border-radius: 18px; }
-      .water-panel { gap: 16px; }
-      .tank { width: 94px; height: 130px; flex-basis: 94px; }
-      .condition { font-size: 20px; }
-      .updated { display: none; }
-      footer { flex-direction: column; }
-      .login-form { flex-direction: column; }
-      .login-form input,.login-form button { width: 100%; }
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 11px;
+      padding: 13px 20px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 13px;
+      transition: .2s;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .reset-button {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: white;
+    }
+
+    .reset-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    .footer {
+      margin-top: 25px;
+      padding: 17px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.8;
+    }
+
+    #updated {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 15px;
+    }
+
+    @media(max-width: 650px) {
+      body {
+        padding: 13px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .brand h1 {
+        font-size: 21px;
+      }
+
+      .value {
+        font-size: 30px;
+      }
+
+      .welcome {
+        padding: 20px;
+      }
+
+      .tank-area {
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
 
 <body>
-<main class="wrap">
 
-  <!-- HEADER -->
+<div class="container">
+
   <header>
     <div class="brand">
-      <div class="logo" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M12 2.8S5.5 10 5.5 14.7a6.5 6.5 0 0 0 13 0C18.5 10 12 2.8 12 2.8Z"
-            stroke="white" stroke-width="1.8"/>
-          <path d="M9 15.5c.3 1.4 1.2 2.2 2.7 2.5"
-            stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </div>
-
-      <div>
-        <h1>SMART WATER SYSTEM</h1>
-        <div class="sub">Dashboard monitoring air · ESP8266</div>
-      </div>
+      <h1>SMART <span>WATER</span> SYSTEM</h1>
+      <p>Smart Water Monitoring & Automatic Control</p>
     </div>
 
-    <div class="web-badge" id="webBadge">
-      <span class="pulse"></span>
-      <span id="webBadgeText">MENUNGGU FIREBASE</span>
+    <div class="connection">
+      <span class="dot" id="connectionDot"></span>
+      <span id="connection">MENGHUBUNGKAN FIREBASE</span>
     </div>
   </header>
 
-  <!-- LOGIN FIREBASE -->
-  <section class="card login-card" id="loginPanel">
-    <h3>Login Smart Water System</h3>
-    <div class="sub">Masuk menggunakan akun Firebase Authentication.</div>
-
-    <form class="login-form" id="loginForm">
-      <input
-        type="email"
-        id="email"
-        placeholder="Email Firebase"
-        autocomplete="username"
-        required
-      >
-
-      <input
-        type="password"
-        id="password"
-        placeholder="Password Firebase"
-        autocomplete="current-password"
-        required
-      >
-
-      <button type="submit" id="loginButton">LOGIN</button>
-    </form>
-
-    <p class="login-message" id="loginMessage">
-      Silakan login untuk melihat data perangkat.
+  <section class="welcome">
+    <h2>Dashboard Monitoring Air</h2>
+    <p>
+      Pantau debit air, volume penggunaan air, kondisi tangki,
+      serta status pompa secara realtime melalui Firebase.
     </p>
   </section>
 
-  <div class="logout-row" id="logoutRow" hidden>
-    <button class="logout-btn" id="logoutButton">KELUAR</button>
-  </div>
+  <section class="grid">
 
-  <!-- WELCOME -->
-  <section class="welcome">
-    <div>
-      <h2>Ringkasan Sistem</h2>
-      <p>Pantau aliran air dan kondisi pompa dalam satu tampilan.</p>
+    <div class="card">
+      <div class="card-header">
+        <h3>DEBIT AIR</h3>
+        <div class="card-icon">💧</div>
+      </div>
+      <div class="value" id="flow">0.00</div>
+      <div class="unit">Liter / Menit</div>
     </div>
 
-    <div class="updated" id="updatedInfo">
-      Menunggu data perangkat
+    <div class="card">
+      <div class="card-header">
+        <h3>TOTAL VOLUME AIR</h3>
+        <div class="card-icon">📊</div>
+      </div>
+      <div class="value" id="volume">0.00</div>
+      <div class="unit">Liter</div>
     </div>
-  </section>
 
-  <!-- DASHBOARD -->
-  <section class="grid" aria-label="Ringkasan monitoring">
-
-    <!-- DEBIT -->
-    <article class="card metric">
-      <div class="metric-top">
-        <span class="metric-label">Debit Air</span>
-        <span class="icon">💧</span>
+    <div class="card">
+      <div class="card-header">
+        <h3>KONDISI AIR</h3>
+        <div class="card-icon">🌊</div>
       </div>
 
-      <div class="value">
-        <span id="flowRate">0.00</span>
-        <span class="unit">L/menit</span>
-      </div>
-
-      <div class="hint">Data dari flow sensor S201</div>
-    </article>
-
-    <!-- TOTAL VOLUME -->
-    <article class="card metric">
-      <div class="metric-top">
-        <span class="metric-label">Total Volume</span>
-        <span class="icon">◉</span>
-      </div>
-
-      <div class="value">
-        <span id="totalLiter">0.00</span>
-        <span class="unit">Liter</span>
-      </div>
-
-      <div class="hint">Akumulasi penggunaan air</div>
-    </article>
-
-    <!-- KONDISI AIR -->
-    <article class="card metric">
-      <div class="metric-top">
-        <span class="metric-label">Kondisi Air</span>
-        <span class="icon">〰</span>
-      </div>
-
-      <div class="value" style="font-size:25px">
-        <span id="waterStatus">—</span>
-      </div>
-
-      <div class="hint">Data dari float switch</div>
-    </article>
-
-    <!-- STATUS POMPA -->
-    <article class="card metric">
-      <div class="metric-top">
-        <span class="metric-label">Status Pompa</span>
-        <span class="icon">⏻</span>
-      </div>
-
-      <div class="value" style="font-size:25px">
-        <span id="pumpStatus">—</span>
-      </div>
-
-      <div class="hint">Status relay / pompa</div>
-    </article>
-
-    <!-- VISUALISASI AIR -->
-    <article class="card wide">
-      <div class="section-title">
-        <h3>Indikator Kondisi Air</h3>
-        <span class="tag">Float Switch</span>
-      </div>
-
-      <div class="water-panel">
+      <div class="tank-area">
         <div class="tank">
           <div class="water" id="waterFill"></div>
-          <div class="tank-label" id="tankLabel">—</div>
         </div>
 
-        <div>
-          <div class="condition" id="conditionText">
-            Menunggu data
-          </div>
-
-          <div class="condition-note" id="conditionNote">
-            Indikator akan mengikuti status float switch dari ESP8266.
-            Sensor ini menunjukkan kondisi berdasarkan posisi pelampung,
-            bukan persentase ketinggian air.
-          </div>
+        <div class="tank-info">
+          <h3 id="level">MENUNGGU DATA</h3>
+          <p>Status ketinggian air berdasarkan float switch.</p>
         </div>
       </div>
-    </article>
+    </div>
 
-    <!-- STATUS PERANGKAT -->
-    <article class="card side">
-      <div class="section-title">
-        <h3>Status Perangkat</h3>
-        <span class="tag">Firebase Cloud</span>
+    <div class="card">
+      <div class="card-header">
+        <h3>STATUS POMPA</h3>
+        <div class="card-icon">⚙️</div>
       </div>
 
-      <div class="state-row">
-        <span class="state-name">ESP8266</span>
-        <span class="state" id="espStatus">MENUNGGU</span>
+      <div class="value" id="pump">—</div>
+      <div class="unit">Automatic Pump Control</div>
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <div class="card-header">
+        <h3>STATUS PERANGKAT</h3>
+        <div class="card-icon">📡</div>
       </div>
 
-      <div class="state-row">
-        <span class="state-name">Flow sensor</span>
-        <span class="state" id="flowSensorStatus">MENUNGGU</span>
+      <div class="devices">
+
+        <div class="device">
+          <p>ESP8266</p>
+          <strong class="status" id="espStatus">MENUNGGU</strong>
+        </div>
+
+        <div class="device">
+          <p>FLOW SENSOR</p>
+          <strong class="status" id="flowStatus">MENUNGGU</strong>
+        </div>
+
+        <div class="device">
+          <p>FLOAT SWITCH</p>
+          <strong class="status" id="floatStatus">MENUNGGU</strong>
+        </div>
+
+        <div class="device">
+          <p>RELAY</p>
+          <strong class="status" id="relayStatus">MENUNGGU</strong>
+        </div>
+
       </div>
 
-      <div class="state-row">
-        <span class="state-name">Float switch</span>
-        <span class="state" id="floatStatus">MENUNGGU</span>
-      </div>
-
-      <div class="state-row">
-        <span class="state-name">Relay / pompa</span>
-        <span class="state" id="relayStatus">MENUNGGU</span>
-      </div>
-    </article>
-
-    <!-- INFORMASI KONEKSI -->
-    <aside class="card notice">
-      <div class="notice-icon">ⓘ</div>
-
-      <div>
-        <strong id="noticeTitle">
-          Menunggu koneksi Firebase
-        </strong>
-
-        <p id="firebaseStatus">
-          Silakan login menggunakan akun Firebase untuk mulai menerima
-          data dari ESP8266.
-        </p>
-      </div>
-    </aside>
+      <div id="updated">Menunggu data perangkat...</div>
+    </div>
 
   </section>
 
-  <footer>
-    <span>© Smart Water System</span>
-    <span>ESP8266 · Firebase Realtime Database</span>
+  <div class="actions">
+    <button
+      class="reset-button"
+      id="resetButton"
+      type="button">
+      ↻ RESET VOLUME
+    </button>
+  </div>
+
+  <footer class="footer">
+    SMART WATER SYSTEM<br>
+    ESP8266 • Firebase Realtime Database • Cloudflare Pages<br>
+    Monitoring dan pengendalian air otomatis
   </footer>
 
-</main>
+</div>
 
-<!-- FIREBASE -->
 <script type="module">
+
+  // =====================================
+  // FIREBASE IMPORT
+  // =====================================
 
   import { initializeApp }
     from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 
   import {
-    getAuth,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
-
-  import {
     getDatabase,
     ref,
-    onValue
+    onValue,
+    set
   } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
 
 
@@ -715,35 +487,12 @@
   // INITIALIZE FIREBASE
   // =====================================
 
-  const firebaseApp = initializeApp(firebaseConfig);
-  const auth = getAuth(firebaseApp);
-  const database = getDatabase(firebaseApp);
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
 
   // =====================================
-  // HTML ELEMENTS
-  // =====================================
-
-  const loginPanel = document.getElementById("loginPanel");
-  const loginForm = document.getElementById("loginForm");
-  const loginButton = document.getElementById("loginButton");
-  const loginMessage = document.getElementById("loginMessage");
-
-  const logoutRow = document.getElementById("logoutRow");
-  const logoutButton = document.getElementById("logoutButton");
-
-  const webBadge = document.getElementById("webBadge");
-  const webBadgeText = document.getElementById("webBadgeText");
-
-  const firebaseStatus = document.getElementById("firebaseStatus");
-  const noticeTitle = document.getElementById("noticeTitle");
-  const updatedInfo = document.getElementById("updatedInfo");
-
-  let stopListening = null;
-
-
-  // =====================================
-  // HELPER FUNCTIONS
+  // ELEMENT HELPER
   // =====================================
 
   function showValue(id, value) {
@@ -755,370 +504,191 @@
   }
 
 
-  function setDeviceStatus(id, value, statusClass = "") {
+  function setStatus(id, text, type = "") {
     const element = document.getElementById(id);
 
     if (!element) return;
 
-    element.textContent = value;
-    element.classList.remove("on", "off");
-
-    if (statusClass) {
-      element.classList.add(statusClass);
-    }
+    element.textContent = text;
+    element.className = "status " + type;
   }
 
 
-  function formatNumber(value) {
-    const number = Number(value);
+  function setConnection(online) {
+    const dot = document.getElementById("connectionDot");
 
-    if (!Number.isFinite(number)) {
-      return "0.00";
-    }
+    dot.className = online ? "dot online" : "dot offline";
 
-    return number.toFixed(2);
-  }
-
-
-  function normalizeStatus(value) {
-    if (value === true || value === 1) return "ON";
-    if (value === false || value === 0) return "OFF";
-
-    if (value === null || value === undefined) {
-      return "—";
-    }
-
-    return String(value).trim();
-  }
-
-
-  function isPumpOn(value) {
-    const status = normalizeStatus(value).toUpperCase();
-
-    return [
-      "ON",
-      "NYALA",
-      "MENYALA",
-      "AKTIF",
-      "HIDUP",
-      "TRUE",
-      "1"
-    ].includes(status);
-  }
-
-
-  function isWaterFull(value) {
-    const status = String(value ?? "").trim().toUpperCase();
-
-    if (
-      status.includes("BELUM") ||
-      status.includes("TIDAK") ||
-      status.includes("KOSONG") ||
-      status === "LOW"
-    ) {
-      return false;
-    }
-
-    return [
-      "PENUH",
-      "FULL",
-      "HIGH",
-      "TERISI",
-      "1",
-      "TRUE"
-    ].includes(status);
+    showValue(
+      "connection",
+      online ? "FIREBASE TERHUBUNG" : "FIREBASE TERPUTUS"
+    );
   }
 
 
   // =====================================
-  // RESET DASHBOARD
+  // RESET DASHBOARD DISPLAY
   // =====================================
 
   function resetDashboard() {
-    showValue("flowRate", "0.00");
-    showValue("totalLiter", "0.00");
-    showValue("waterStatus", "—");
-    showValue("pumpStatus", "—");
-
-    showValue("tankLabel", "—");
-    showValue("conditionText", "Menunggu data");
+    showValue("flow", "0.00");
+    showValue("volume", "0.00");
+    showValue("level", "MENUNGGU DATA");
+    showValue("pump", "—");
 
     document.getElementById("waterFill").style.height = "35%";
 
-    setDeviceStatus("espStatus", "MENUNGGU");
-    setDeviceStatus("flowSensorStatus", "MENUNGGU");
-    setDeviceStatus("floatStatus", "MENUNGGU");
-    setDeviceStatus("relayStatus", "MENUNGGU");
+    setStatus("espStatus", "MENUNGGU");
+    setStatus("flowStatus", "MENUNGGU");
+    setStatus("floatStatus", "MENUNGGU");
+    setStatus("relayStatus", "MENUNGGU");
 
-    updatedInfo.textContent = "Menunggu data perangkat";
+    showValue("updated", "Menunggu data perangkat...");
   }
 
 
   // =====================================
-  // DISPLAY DATA FROM FIREBASE
+  // READ FIREBASE DATA
   // =====================================
 
-  function displayData(data) {
+  const currentRef = ref(db, "SmartWater/current");
 
-    if (!data) {
-      noticeTitle.textContent = "Data belum tersedia";
+  onValue(
+    currentRef,
 
-      firebaseStatus.textContent =
-        "Login berhasil, tetapi data pada SmartWater/current belum ditemukan. " +
-        "Pastikan ESP8266 sudah mengirim data ke Firebase.";
+    (snapshot) => {
 
-      return;
-    }
+      if (!snapshot.exists()) {
+        resetDashboard();
+        setConnection(true);
+        return;
+      }
 
+      const data = snapshot.val();
 
-    // DEBIT AIR
-    if (data.flowRate !== undefined) {
-      showValue("flowRate", formatNumber(data.flowRate));
-      setDeviceStatus("flowSensorStatus", "DATA DITERIMA", "on");
-    } else {
-      setDeviceStatus("flowSensorStatus", "MENUNGGU");
-    }
+      const flow = Number(data.flowRate ?? 0);
+      const volume = Number(data.totalLiter ?? 0);
 
+      const waterStatus = data.waterStatus ?? "MENUNGGU DATA";
+      const pumpStatus = data.pumpStatus ?? "MENUNGGU DATA";
 
-    // TOTAL VOLUME
-    if (data.totalLiter !== undefined) {
-      showValue("totalLiter", formatNumber(data.totalLiter));
-    }
+      showValue("flow", flow.toFixed(2));
+      showValue("volume", volume.toFixed(2));
+      showValue("level", waterStatus);
+      showValue("pump", pumpStatus);
 
+      // Indikator tangki
+      const waterFill = document.getElementById("waterFill");
 
-    // KONDISI AIR
-    const water = normalizeStatus(data.waterStatus);
+      waterFill.style.height =
+        waterStatus === "AIR PENUH" ? "100%" :
+        waterStatus === "AIR BELUM PENUH" ? "35%" : "0%";
 
-    showValue("waterStatus", water);
-    showValue("tankLabel", water);
-    showValue("conditionText", water);
+      // Status perangkat
+      setStatus("espStatus", "ONLINE", "good");
+      setStatus("flowStatus", "AKTIF", "good");
 
+      if (waterStatus === "AIR PENUH") {
+        setStatus("floatStatus", "PENUH", "good");
+      } else {
+        setStatus("floatStatus", "BELUM PENUH", "warning");
+      }
 
-    if (data.waterStatus !== undefined) {
-      setDeviceStatus("floatStatus", water, "on");
+      if (pumpStatus === "MENYALA") {
+        setStatus("relayStatus", "AKTIF", "good");
+      } else {
+        setStatus("relayStatus", "MATI", "warning");
+      }
 
-      const full = isWaterFull(data.waterStatus);
-
-      document.getElementById("waterFill").style.height =
-        full ? "85%" : "25%";
-
-      document.getElementById("conditionNote").textContent =
-        full
-          ? "Float switch mendeteksi kondisi air penuh."
-          : "Float switch belum mendeteksi kondisi air penuh.";
-    }
-
-
-    // STATUS POMPA
-    const pump = normalizeStatus(data.pumpStatus);
-
-    showValue("pumpStatus", pump);
-
-    if (data.pumpStatus !== undefined) {
-      const pumpOn = isPumpOn(data.pumpStatus);
-
-      setDeviceStatus(
-        "relayStatus",
-        pumpOn ? "POMPA ON" : pump,
-        pumpOn ? "on" : "off"
+      showValue(
+        "updated",
+        "Data terakhir diterima: " + new Date().toLocaleTimeString("id-ID")
       );
+
+      setConnection(true);
+
+    },
+
+    (error) => {
+
+      console.error("Firebase read error:", error);
+
+      setConnection(false);
+
+      showValue("updated", "Gagal membaca data Firebase: " + error.message);
+
     }
 
-
-    // STATUS DATA ESP8266
-    setDeviceStatus("espStatus", "DATA DITERIMA", "on");
-
-
-    // WAKTU PEMBARUAN
-    updatedInfo.textContent =
-      "Data diterima\n" +
-      new Date().toLocaleTimeString("id-ID");
-
-
-    // INFORMASI
-    noticeTitle.textContent = "Dashboard berhasil terhubung";
-
-    firebaseStatus.textContent =
-      "Data dari Firebase Realtime Database berhasil diterima. " +
-      "Dashboard akan diperbarui otomatis saat ada perubahan data.";
-  }
+  );
 
 
   // =====================================
-  // LOGIN
+  // ONLINE RESET BUTTON
   // =====================================
 
-  loginForm.addEventListener("submit", async function(event) {
+  const resetButton = document.getElementById("resetButton");
 
-    event.preventDefault();
+  resetButton.addEventListener("click", async () => {
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
+    const confirmation = confirm(
+      "Apakah kamu yakin ingin mereset total volume air?"
+    );
 
-    loginButton.disabled = true;
-    loginButton.textContent = "MEMPROSES...";
-
-    loginMessage.className = "login-message";
-    loginMessage.textContent = "Sedang menghubungkan ke Firebase...";
+    if (!confirmation) return;
 
     try {
 
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      resetButton.disabled = true;
+      resetButton.textContent = "MENGIRIM PERINTAH...";
 
-      loginMessage.textContent = "Login berhasil.";
-      loginMessage.classList.add("success");
-
-      document.getElementById("password").value = "";
-
-    } catch (error) {
-
-      console.error("Firebase login error:", error);
-
-      loginMessage.className = "login-message error";
-
-      if (error.code === "auth/invalid-credential") {
-        loginMessage.textContent =
-          "Email atau password Firebase tidak sesuai.";
-      } else if (error.code === "auth/invalid-email") {
-        loginMessage.textContent =
-          "Format email tidak valid.";
-      } else if (error.code === "auth/unauthorized-domain") {
-        loginMessage.textContent =
-          "Domain website belum diizinkan di Firebase Authentication.";
-      } else if (error.code === "auth/too-many-requests") {
-        loginMessage.textContent =
-          "Terlalu banyak percobaan login. Coba lagi nanti.";
-      } else {
-        loginMessage.textContent =
-          "Login gagal: " + error.message;
-      }
-
-    } finally {
-
-      loginButton.disabled = false;
-      loginButton.textContent = "LOGIN";
-
-    }
-
-  });
-
-
-  // =====================================
-  // AUTHENTICATION STATE
-  // =====================================
-
-  onAuthStateChanged(auth, function(user) {
-
-    // Hentikan listener sebelumnya
-    if (stopListening) {
-      stopListening();
-      stopListening = null;
-    }
-
-
-    if (user) {
-
-      // LOGIN BERHASIL
-      loginPanel.hidden = true;
-      logoutRow.hidden = false;
-
-      webBadge.classList.add("connected");
-      webBadgeText.textContent = "FIREBASE TERHUBUNG";
-
-      noticeTitle.textContent = "Menghubungkan data perangkat...";
-      firebaseStatus.textContent =
-        "Login berhasil. Sedang membaca SmartWater/current.";
-
-      // Ambil data pada lokasi yang sama dengan program ESP8266
-      const dataRef = ref(database, "SmartWater/current");
-
-      stopListening = onValue(
-        dataRef,
-
-        function(snapshot) {
-
-          const data = snapshot.val();
-
-          if (data === null) {
-
-            noticeTitle.textContent = "Data belum tersedia";
-
-            firebaseStatus.textContent =
-              "Belum ada data pada SmartWater/current. " +
-              "Pastikan ESP8266 sudah terhubung dan mengirim data.";
-
-            setDeviceStatus("espStatus", "BELUM ADA DATA");
-
-            return;
-          }
-
-          displayData(data);
-
-        },
-
-        function(error) {
-
-          console.error("Firebase database error:", error);
-
-          noticeTitle.textContent = "Gagal membaca Firebase";
-
-          firebaseStatus.textContent =
-            "Terjadi kesalahan: " + error.message;
-
-          setDeviceStatus("espStatus", "GAGAL", "off");
-
+      await set(
+        ref(db, "SmartWater/commands/resetVolume"),
+        {
+          requested: true,
+          requestedAt: Date.now()
         }
       );
 
-
-    } else {
-
-      // BELUM LOGIN
-      loginPanel.hidden = false;
-      logoutRow.hidden = true;
-
-      webBadge.classList.remove("connected");
-      webBadgeText.textContent = "MENUNGGU FIREBASE";
-
-      noticeTitle.textContent = "Menunggu login Firebase";
-
-      firebaseStatus.textContent =
-        "Login menggunakan akun Firebase untuk melihat data ESP8266.";
-
-      resetDashboard();
-
-    }
-
-  });
-
-
-  // =====================================
-  // LOGOUT
-  // =====================================
-
-  logoutButton.addEventListener("click", async function() {
-
-    try {
-
-      await signOut(auth);
-
-      loginMessage.className = "login-message";
-      loginMessage.textContent = "Berhasil keluar dari akun.";
+      alert(
+        "Perintah reset berhasil dikirim ke Firebase. " +
+        "Menunggu ESP8266 memproses perintah."
+      );
 
     } catch (error) {
 
-      console.error("Logout error:", error);
+      console.error("Reset error:", error);
 
-      firebaseStatus.textContent =
-        "Gagal keluar: " + error.message;
+      alert(
+        "Reset gagal: " + error.message +
+        "\nPeriksa izin akses Firebase."
+      );
+
+    } finally {
+
+      resetButton.disabled = false;
+      resetButton.textContent = "↻ RESET VOLUME";
 
     }
 
   });
+
+
+  // =====================================
+  // FIREBASE CONNECTION STATUS
+  // =====================================
+
+  onValue(
+    ref(db, ".info/connected"),
+
+    (snapshot) => {
+      setConnection(snapshot.val() === true);
+    },
+
+    (error) => {
+      console.error("Connection status error:", error);
+    }
+
+  );
 
 </script>
 
