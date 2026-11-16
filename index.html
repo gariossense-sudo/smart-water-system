@@ -233,6 +233,7 @@
       right: -38px;
       bottom: -55px;
       background: rgba(57,184,242,.07);
+      pointer-events: none;
     }
 
     .metric-top {
@@ -275,6 +276,32 @@
     }
 
     .hint { font-size: 11px; color: #7894aa; margin-top: 5px; }
+
+    /* TOMBOL RESET VOLUME */
+    .reset-btn {
+      margin-top: 12px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,113,133,.3);
+      background: rgba(255,113,133,.14);
+      color: #ff9aa9;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .reset-btn:hover:not(:disabled) {
+      background: rgba(255,113,133,.25);
+      color: #fff;
+    }
+
+    .reset-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
 
     .wide { grid-column: span 7; }
     .side { grid-column: span 5; }
@@ -564,6 +591,9 @@
       </div>
 
       <div class="hint">Akumulasi penggunaan air</div>
+      <button type="button" class="reset-btn" id="resetVolumeBtn" disabled>
+        ↺ Reset Volume
+      </button>
     </article>
 
     <!-- KONDISI AIR -->
@@ -690,7 +720,8 @@
   import {
     getDatabase,
     ref,
-    onValue
+    onValue,
+    update
   } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
 
 
@@ -730,6 +761,7 @@
 
   const logoutRow = document.getElementById("logoutRow");
   const logoutButton = document.getElementById("logoutButton");
+  const resetVolumeBtn = document.getElementById("resetVolumeBtn");
 
   const webBadge = document.getElementById("webBadge");
   const webBadgeText = document.getElementById("webBadgeText");
@@ -944,6 +976,45 @@
 
 
   // =====================================
+  // RESET VOLUME KE FIREBASE
+  // =====================================
+
+  resetVolumeBtn.addEventListener("click", async function() {
+    if (!auth.currentUser) {
+      alert("Silakan login terlebih dahulu.");
+      return;
+    }
+
+    const konfirmasi = confirm("Yakin ingin me-reset Total Volume air menjadi 0.00 Liter?");
+    if (!konfirmasi) return;
+
+    resetVolumeBtn.disabled = true;
+    resetVolumeBtn.textContent = "Mereset...";
+
+    try {
+      const dataRef = ref(database, "SmartWater/current");
+
+      // Mengubah totalLiter menjadi 0 & mengirim sinyal resetCommand untuk ESP8266
+      await update(dataRef, {
+        totalLiter: 0,
+        resetCommand: true
+      });
+
+      noticeTitle.textContent = "Volume air berhasil di-reset";
+      firebaseStatus.textContent =
+        "Total volume di Firebase telah diatur ulang menjadi 0.00 Liter.";
+
+    } catch (error) {
+      console.error("Reset error:", error);
+      alert("Gagal melakukan reset: " + error.message);
+    } finally {
+      resetVolumeBtn.disabled = false;
+      resetVolumeBtn.textContent = "↺ Reset Volume";
+    }
+  });
+
+
+  // =====================================
   // LOGIN
   // =====================================
 
@@ -1024,6 +1095,7 @@
       // LOGIN BERHASIL
       loginPanel.hidden = true;
       logoutRow.hidden = false;
+      resetVolumeBtn.disabled = false;
 
       webBadge.classList.add("connected");
       webBadgeText.textContent = "FIREBASE TERHUBUNG";
@@ -1079,6 +1151,7 @@
       // BELUM LOGIN
       loginPanel.hidden = false;
       logoutRow.hidden = true;
+      resetVolumeBtn.disabled = true;
 
       webBadge.classList.remove("connected");
       webBadgeText.textContent = "MENUNGGU FIREBASE";
