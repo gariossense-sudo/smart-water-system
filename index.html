@@ -975,38 +975,46 @@
   }
 
 
-  // =====================================
+// =====================================
   // RESET VOLUME KE FIREBASE
   // =====================================
-
   resetVolumeBtn.addEventListener("click", async function() {
     if (!auth.currentUser) {
       alert("Silakan login terlebih dahulu.");
       return;
     }
 
-    const konfirmasi = confirm("Yakin ingin me-reset Total Volume air menjadi 0.00 Liter?");
+    const konfirmasi = confirm(
+      "Yakin ingin me-reset Total Volume air menjadi 0.00 Liter?"
+    );
+
     if (!konfirmasi) return;
 
     resetVolumeBtn.disabled = true;
     resetVolumeBtn.textContent = "Mereset...";
 
     try {
-      const dataRef = ref(database, "SmartWater/current");
+      // Kirim perintah ke alamat yang dibaca ESP8266
+      const resetRef = ref(
+        database,
+        "SmartWater/commands/resetVolume"
+      );
 
-      // Mengubah totalLiter menjadi 0 & mengirim sinyal resetCommand untuk ESP8266
-      await update(dataRef, {
-        totalLiter: 0,
-        resetCommand: true
+      await update(resetRef, {
+        requested: true
       });
 
-      noticeTitle.textContent = "Volume air berhasil di-reset";
+      noticeTitle.textContent = "Perintah reset terkirim";
+
       firebaseStatus.textContent =
-        "Total volume di Firebase telah diatur ulang menjadi 0.00 Liter.";
+        "Perintah reset berhasil dikirim ke ESP8266. " +
+        "Menunggu perangkat mengatur ulang volume.";
 
     } catch (error) {
       console.error("Reset error:", error);
-      alert("Gagal melakukan reset: " + error.message);
+
+      alert("Gagal mengirim reset: " + error.message);
+
     } finally {
       resetVolumeBtn.disabled = false;
       resetVolumeBtn.textContent = "↺ Reset Volume";
